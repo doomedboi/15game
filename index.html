@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>15 game</title>
+    <meta name="description" content="My template">
+    <style>
+        body {background-color: #708090;}
+        #game_table{
+            position: relative;
+            width: 325px;
+            height: 325px;
+            margin: 80px auto 0;
+            border: 8px solid #D3D3D3;
+            border-radius: 4px;
+        }
+        #game_table span{
+            position: absolute;
+            display: block;
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+        }
+        #game_table span.number{
+            cursor: pointer;
+            font: bold 36px/80px Arial;
+            text-align: center;
+            text-shadow: -1px -1px 0 rgba(0,0,0, 0.5);
+            color: #fff;
+        }
+        #game_table span.empty{background: transparent;}
+        #game_table span.number.light{background: #B0E0E6;}
+        #game_table span.number.dark{background: #EE82EE;}
+
+        #game_table.animate span{
+            -webkit-transition: 0.15s left, 0.15s top;
+            transition: 0.15s left, 0.15s top;
+        }
+    </style>
+</head>
+<body class="">
+<div id="game_table"></div>
+
+
+<script>
+    let GameTable = document.getElementById('game_table')
+    GameTable.addEventListener('click', (e) => {
+        GameTable.className ='animate'
+        MakeMove(e.target)
+    })
+
+    GenerateTable()
+
+    function GenerateTable() {
+        GameTable.innerHTML = ''
+        GameTable.removeAttribute('class');
+        let nums = new Array(15)
+        for (let i = 0; i < 15; i++) {
+            let num = Math.floor(Math.random() * (15-1+1)+1)
+            while (nums.includes(num)) {
+                num = Math.floor(Math.random() * (15-1+1)+1)
+            }
+            nums[i] = num
+        }
+
+        let currBoxNum = 1
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const box = document.createElement('span')
+                /*filling attributes */
+                box.id = i+'-'+j;
+                box.style.left = (j*80+j+1)+'px';
+                box.style.top = (i*80+i+1)+'px';
+
+                if (currBoxNum <= 15) {
+                    box.classList.add('number')
+                    box.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light')
+                    box.innerHTML = parseInt(nums[currBoxNum-1])
+                } else {
+                    box.className = 'empty'
+                }
+
+                currBoxNum++;
+                GameTable.appendChild(box);
+            }
+        }
+
+    }
+
+    function GetEmptyBox() {
+        for (let i = 0; i < 4; i++)
+            for (let j = 0; j < 4; j++) {
+                const box = GetBox(i, j)
+                if (box.className === 'empty')
+                    return box;
+            }
+    }
+
+    function GetAdjacentEmpty(target) {
+        //get adjacent
+        const targetId = target.id.split('-')
+        let row = parseInt( targetId[0])
+        const col = parseInt( targetId[1] )
+        //check diaposons
+        if (row < 3) {
+            const box = GetBox(row+1, col)
+            if (box.className === 'empty')
+                return box;
+        }
+        if (row > 0) {
+            const box = GetBox(row-1, col)
+            if (box.className === 'empty')
+                return box;
+        }
+        if (col < 3) {
+            const box = GetBox(row, col+1)
+            if (box.className === 'empty')
+                return box;
+        }
+        if (col > 0) {
+            const box = GetBox(row, col-1)
+            if (box.className === 'empty')
+                return box;
+        }
+
+        return false;
+    }
+
+
+
+    function MakeMove(box) {
+        if (box.className == 'empty')
+            return;
+        let empty = GetAdjacentEmpty(box)
+        if (!empty)
+            return
+        /*exch*/
+        const tmp = {style: box.style.cssText,id: box.id}
+
+        box.style.cssText = empty.style.cssText
+        box.id = empty.id
+
+        empty.style.cssText = tmp.style
+        empty.id = tmp.id
+        //check for finish
+        CheckFinish()
+    }
+
+    function GetBox(str, col) {
+        return document.getElementById(parseInt(str)+'-'+parseInt(col))
+    }
+
+
+    function CheckFinish() {
+        //check right down box
+        if (GetBox(3,3).className != 'empty') {
+            return false;
+        }
+        let currNum = 1;
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                if (currNum < 16 && GetBox(i,j).innerHTML != currNum) {
+                    return false;
+                }
+                currNum++;
+            }
+        }
+        //all boxes in right pos
+        if (confirm('You win! Do you want make it again?')) {
+            GenerateTable()
+        }
+
+
+    }
+
+</script>
+
+</body>
+</html>
