@@ -75,7 +75,7 @@
                 if (currBoxNum <= 15) {
                     box.classList.add('number')
                     box.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light')
-                    box.innerHTML = parseInt(nums[currBoxNum-1])
+                    box.innerHTML = nums[currBoxNum-1]
                 } else {
                     box.className = 'empty'
                 }
@@ -85,15 +85,6 @@
             }
         }
 
-    }
-
-    function GetEmptyBox() {
-        for (let i = 0; i < 4; i++)
-            for (let j = 0; j < 4; j++) {
-                const box = GetBox(i, j)
-                if (box.className === 'empty')
-                    return box;
-            }
     }
 
     function GetAdjacentEmpty(target) {
@@ -170,10 +161,8 @@
             GenerateTable()
         }
 
-
     }
 
 </script>
-
 </body>
 </html>
